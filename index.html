@@ -1,0 +1,63 @@
+<!-- ░█░█░█░█░█▀█░█▄█░█▀█░█▀▄░▀█▀
+     ░█▀█░█▀▄░█▀█░█░█░█░█░█▀▄░░█░
+     ░▀░▀░▀░▀░▀░▀░▀░▀░▀▀▀░▀░▀░▀▀▀             
+     Name: index.html
+     Description: Main page of website
+     Author: hkamori | 0xhkamori.github.io
+     ----------------------------------------------
+     🔒    Licensed under the GNU AGPLv3
+     🌐 https://www.gnu.org/licenses/agpl-3.0.html
+     ------------------------------------------------    -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Claude FREE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="layout-container">
+        <div class="sidebar">
+            <button class="btn btn-primary new-chat-btn" id="newChatBtn">
+                <i class="fas fa-plus"></i> New Chat
+            </button>
+            <div class="chat-list" id="chatList">
+                <div class="chat-item active" data-chat="1">
+                    <span><i class="fas fa-comment-alt"></i> Chat 1</span>
+                    <span class="close-btn">&times;</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-chat">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="typing-text">Hello! I can help you with coding and technical questions.</div>
+                </div>
+            </div>
+            <div class="input-container">
+                <textarea class="chat-input" id="messageInput" rows="3" placeholder="Type your message..."></textarea>
+            </div>
+        </div>
+
+        <div class="code-area">
+            <div class="code-header">
+                Code Output
+            </div>
+            <div class="code-content" id="codeContent">
+// Your code will appear here
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/animatedTitle.js"></script>
+</body>
+</html>

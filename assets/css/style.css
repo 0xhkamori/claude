@@ -200,3 +200,19 @@ body {
     from, to { border-color: transparent }
     50% { border-color: #fff }
 }
+
+.code-header .btn-primary {
+    background-color: #264f78;
+    border-color: #264f78;
+    transition: all 0.2s ease;
+}
+
+.code-header .btn-primary:hover {
+    background-color: #1c3a5a;
+    border-color: #1c3a5a;
+}
+
+.code-header .btn-primary:active {
+    background-color: #15293f;
+    border-color: #15293f;
+}

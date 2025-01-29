@@ -96,7 +96,10 @@ messageInput.addEventListener('keypress', async (e) => {
             try {
                 const resp = await puter.ai.chat(message, { model: 'claude', stream: true });
                 let fullResponse = '';
-                
+                let isInCodeBlock = false;
+                let currentCodeBlock = '';
+                let codeBlockFound = false;
+
                 const botMessageDiv = document.createElement('div');
                 botMessageDiv.className = 'message bot-message';
                 const typingDiv = document.createElement('div');
@@ -106,15 +109,52 @@ messageInput.addEventListener('keypress', async (e) => {
 
                 for await (const part of resp) {
                     if (part?.text) {
-                        fullResponse += part.text;
-                        typingDiv.textContent = fullResponse;
-                        const code = extractCode(fullResponse);
-                        if (code) {
-                            codeContent.textContent = code;
+                        const text = part.text;
+                        let textToProcess = text;
+
+                        while (textToProcess.length > 0) {
+                            if (!isInCodeBlock) {
+                                const codeStart = textToProcess.indexOf('```');
+                                if (codeStart !== -1 && !codeBlockFound) {
+                                    const beforeCode = textToProcess.substring(0, codeStart);
+                                    fullResponse += beforeCode;
+                                    typingDiv.textContent = fullResponse;
+                                    const codeBadge = document.createElement('span');
+                                    codeBadge.className = 'code-badge btn btn-dark shadow';
+                                    codeBadge.textContent = '</>Code';
+                                    typingDiv.appendChild(codeBadge);
+                                    isInCodeBlock = true;
+                                    codeBlockFound = true;
+                                    textToProcess = textToProcess.substring(codeStart + 3);
+                                    currentCodeBlock = '';
+                                    // Ignore the first line of code
+                                    const newlineIndex = textToProcess.indexOf('\n');
+                                    if (newlineIndex !== -1) {
+                                        textToProcess = textToProcess.substring(newlineIndex + 1);
+                                    }
+                                } else {
+                                    fullResponse += textToProcess;
+                                    typingDiv.textContent = fullResponse;
+                                    textToProcess = '';
+                                }
+                            } else {
+                                const codeEnd = textToProcess.indexOf('```');
+                                if (codeEnd !== -1) {
+                                    currentCodeBlock += textToProcess.substring(0, codeEnd);
+                                    codeContent.textContent = currentCodeBlock;
+                                    isInCodeBlock = false;
+                                    textToProcess = textToProcess.substring(codeEnd + 3);
+                                } else {
+                                    currentCodeBlock += textToProcess;
+                                    codeContent.textContent = currentCodeBlock;
+                                    textToProcess = '';
+                                }
+                            }
                         }
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                     }
                 }
+
             } catch (error) {
                 console.error('AI Error:', error);
                 addBotMessage('Sorry, I encountered an error. Please try again.');
@@ -122,6 +162,8 @@ messageInput.addEventListener('keypress', async (e) => {
         }
     }
 });
+
+
 
 function addUserMessage(text) {
     const message = document.createElement('div');
@@ -219,7 +261,6 @@ function downloadCode() {
     if (!codeContent || codeContent === '// Your code will appear here') {
         return;
     }
-
     const language = detectLanguage(codeContent);
     const extension = languageExtensions[language] || 'txt';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');

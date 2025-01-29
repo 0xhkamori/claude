@@ -65,26 +65,6 @@ async function typeText(element, text) {
     element.classList.remove('typing');
 }
 
-function extractCode(text) {
-    const codePatterns = [
-        /```[\s\S]*?```/g,  // Code blocks
-        /`.*?`/g,           // Inline code
-        /function\s+\w+\s*\{[\s\S]*?\}/g,  // Function definitions
-        /class\s+\w+\s*\{[\s\S]*?\}/g,     // Class definitions
-        /const\s+\w+\s*=\s*function/g,      // Function expressions
-        /import\s+.*?from/g,                // Import statements
-        /export\s+default/g,                // Export statements
-    ];
-
-    for (const pattern of codePatterns) {
-        const match = text.match(pattern);
-        if (match) {
-            return match[0].replace(/```/g, '').trim();
-        }
-    }
-    return null;
-}
-
 messageInput.addEventListener('keypress', async (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();

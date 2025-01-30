@@ -87,6 +87,9 @@ messageInput.addEventListener('keypress', async (e) => {
                 botMessageDiv.appendChild(typingDiv);
                 chatMessages.appendChild(botMessageDiv);
 
+                let textNode = document.createTextNode('');
+                typingDiv.appendChild(textNode);
+
                 for await (const part of resp) {
                     if (part?.text) {
                         const text = part.text;
@@ -98,35 +101,48 @@ messageInput.addEventListener('keypress', async (e) => {
                                 if (codeStart !== -1 && !codeBlockFound) {
                                     const beforeCode = textToProcess.substring(0, codeStart);
                                     fullResponse += beforeCode;
-                                    typingDiv.textContent = fullResponse;
+                                    textNode.textContent = fullResponse;
+
                                     const codeBadge = document.createElement('span');
                                     codeBadge.className = 'code-badge btn btn-dark shadow';
                                     codeBadge.textContent = '</>Code';
+                                    codeBadge.style.cursor = 'pointer';
+                                    codeBadge.addEventListener('click', () => {
+                                        const codeContent = document.getElementById('codeContent');
+                                        navigator.clipboard.writeText(codeContent.textContent);
+                                        codeBadge.textContent = 'Copied!';
+                                        setTimeout(() => {
+                                            codeBadge.textContent = '</>Code';
+                                        }, 2000);
+                                    });
                                     typingDiv.appendChild(codeBadge);
+
                                     isInCodeBlock = true;
                                     codeBlockFound = true;
                                     textToProcess = textToProcess.substring(codeStart + 3);
                                     currentCodeBlock = '';
-                                    // Ignore the first line of code
-                                    const newlineIndex = textToProcess.indexOf('\n');
-                                    if (newlineIndex !== -1) {
-                                        textToProcess = textToProcess.substring(newlineIndex + 1);
-                                    }
                                 } else {
                                     fullResponse += textToProcess;
-                                    typingDiv.textContent = fullResponse;
+                                    textNode.textContent = fullResponse;
                                     textToProcess = '';
                                 }
                             } else {
                                 const codeEnd = textToProcess.indexOf('```');
                                 if (codeEnd !== -1) {
                                     currentCodeBlock += textToProcess.substring(0, codeEnd);
+                                    const codeContent = document.getElementById('codeContent');
                                     codeContent.textContent = currentCodeBlock;
+                                    codeContent.scrollTop = codeContent.scrollHeight;
                                     isInCodeBlock = false;
                                     textToProcess = textToProcess.substring(codeEnd + 3);
+                                    fullResponse = ''; // Reset fullResponse for text after code block
+                                    textNode = document.createTextNode('');
+                                    typingDiv.appendChild(textNode);
                                 } else {
                                     currentCodeBlock += textToProcess;
+                                    const codeContent = document.getElementById('codeContent');
                                     codeContent.textContent = currentCodeBlock;
+                                    codeContent.scrollTop = codeContent.scrollHeight;
                                     textToProcess = '';
                                 }
                             }
@@ -142,8 +158,6 @@ messageInput.addEventListener('keypress', async (e) => {
         }
     }
 });
-
-
 
 function addUserMessage(text) {
     const message = document.createElement('div');
@@ -167,6 +181,7 @@ function addBotMessage(text) {
 function clearMessages() {
     chatMessages.innerHTML = '';
 }
+
 
 const languageExtensions = {
     javascript: 'js',
@@ -226,7 +241,7 @@ function detectLanguage(code) {
         return 'txt';
     }
 
-    const firstLine = code.split('\n')[0].toLowerCase().trim();
+    const firstLine = document.getElementById('codeContent').textContent.split('\n')[0]
     for (const language of Object.keys(languageExtensions)) {
         if (firstLine.includes(language)) {
             return language;
@@ -237,7 +252,7 @@ function detectLanguage(code) {
 }
 
 function downloadCode() {
-    const codeContent = document.getElementById('codeContent').textContent;
+    const codeContent = document.getElementById('codeContent').textContent.split('\n')[1];
     if (!codeContent || codeContent === '// Your code will appear here') {
         return;
     }
@@ -256,6 +271,7 @@ function downloadCode() {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 }
+
 
 function addDownloadButton() {
     const codeHeader = document.querySelector('.code-header');
